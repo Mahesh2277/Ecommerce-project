@@ -8,11 +8,14 @@ const cors = require("cors");
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 
+require("dotenv").config();
 // Database Connection With MongoDB
 
-mongoose.connect("mongodb+srv://mahesh:mahesh123@cluster0.ojbt4rf.mongodb.net/ecommerce", {
+mongoose.connect(`${process.env.MONGODBURL}`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -33,6 +36,8 @@ app.post("/upload", upload.single('product'), (req, res) => {
     image_url: `/images/${req.file.filename}`
   })
 })
+
+
 
 
 // Route for Images folder
@@ -65,7 +70,7 @@ const Users = mongoose.model("Users", {
 });
 
 
-// Schema for creating Product
+// Schema for creating Product../jgbk
 const Product = mongoose.model("Product", {
   id: { type: Number, required: true },
   name: { type: String, required: true },
