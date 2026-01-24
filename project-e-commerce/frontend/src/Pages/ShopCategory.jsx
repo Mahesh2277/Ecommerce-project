@@ -3,30 +3,54 @@ import "./CSS/ShopCategory.css";
 import dropdown_icon from '../Components/Assets/dropdown_icon.png'
 import Item from "../Components/Item/Item";
 import { Link } from "react-router-dom";
+import { backend_url } from "../App";
 
 const ShopCategory = (props) => {
 
   const [allproducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchInfo = () => { 
-    fetch('http://localhost:4000/allproducts') 
-            .then((res) => res.json()) 
-            .then((data) => setAllProducts(data))
-    }
+    setLoading(true);
+    setError(null);
+    
+    fetch(`${backend_url}/allproducts`) 
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setAllProducts(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setError("Failed to load products. Please check if the server is running.");
+        setAllProducts([]);
+        setLoading(false);
+      });
+  }
 
-    useEffect(() => {
-      fetchInfo();
-    }, [])
+  useEffect(() => {
+    fetchInfo();
+  }, [])
     
   return (
     <div className="shopcategory">
       <img src={props.banner} className="shopcategory-banner" alt="" />
+      {error && <div style={{padding: '20px', textAlign: 'center', color: 'red', backgroundColor: '#ffe6e6'}}>{error}</div>}
       <div className="shopcategory-indexSort">
         <p><span>Showing 1 - 12</span> out of 54 Products</p>
         <div className="shopcategory-sort">Sort by  <img src={dropdown_icon} alt="" /></div>
       </div>
       <div className="shopcategory-products">
-        {allproducts.map((item,i) => {
+        {loading ? (
+          <div style={{padding: '20px', textAlign: 'center'}}>Loading products...</div>
+        ) : (
+          allproducts.map((item,i) => {
             if(props.category===item.category)
             {
               return <Item id={item.id} key={i} name={item.name} image={item.image}  new_price={item.new_price} old_price={item.old_price}/>;
@@ -35,7 +59,8 @@ const ShopCategory = (props) => {
             {
               return null;
             }
-        })}
+          })
+        )}
       </div>
       <div className="shopcategory-loadmore">
       <Link to='/' style={{ textDecoration: 'none' }}>Explore More</Link>
