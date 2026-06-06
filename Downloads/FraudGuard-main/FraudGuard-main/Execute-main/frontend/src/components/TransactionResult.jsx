@@ -55,7 +55,6 @@ const TransactionResult = () => {
 
   const riskLevel = getRiskLevel(fraud_score);
 
-  console.log(is_fraud);
   // Determine status styles
   const getStatusStyles = (status, isFraud) => {
     if (isFraud) {

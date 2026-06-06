@@ -75,7 +75,6 @@ exports.getAnalytics = async (req, res) => {
       amountDistribution
     });
   } catch (error) {
-    console.error('Error fetching analytics:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

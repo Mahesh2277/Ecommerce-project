@@ -8,7 +8,6 @@ exports.geminiController = async (req, res)=>{
         const prompt = req.body.prompt || "Explain how AI works";
         const result = await model.generateContent(prompt);
         const ans = result.response.text();
-        console.log(result.response.text()); // result.response.text() <- result ka content
 
         return res.status(200).json({
             success: true,

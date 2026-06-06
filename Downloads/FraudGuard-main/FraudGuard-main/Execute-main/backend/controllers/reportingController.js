@@ -5,7 +5,6 @@ const reportFraud = async (req, res) => {
     try {
         const { transaction_id } = req.body;
 
-        // Validate required fields
         if (!transaction_id) {
             return res.status(400).json({
                 success: false,
@@ -13,7 +12,6 @@ const reportFraud = async (req, res) => {
             });
         }
 
-        // Find the transaction
         const transaction = await transactionModel.findOne({ transaction_id });
         
         if (!transaction) {
@@ -23,17 +21,6 @@ const reportFraud = async (req, res) => {
             });
         }
 
-        // Check if transaction is marked as fraud
-        // if (!transaction.is_fraud) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "Cannot report fraud for a transaction that is not marked as fraudulent"
-        //     });
-        // }
-
-        // Update the transaction with fraud report
-
-        // Create a new fraud report
         const fraudReport = new fraudReportingModel({
             transaction_id: transaction._id,
             is_fraud: true,
@@ -53,7 +40,6 @@ const reportFraud = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error in reportFraud:", error);
         return res.status(500).json({
             success: false,
             message: "Internal server error",

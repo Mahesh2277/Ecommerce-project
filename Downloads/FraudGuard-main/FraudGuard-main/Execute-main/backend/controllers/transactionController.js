@@ -1,4 +1,4 @@
-const Transaction = require('../models/transactionModel'); // You'll need to create this model
+const Transaction = require('../models/transactionModel');
 
 const getTransactions = async (req, res) => {
   try {
@@ -12,7 +12,6 @@ const getTransactions = async (req, res) => {
       limit = 10
     } = req.query;
 
-    // Build filter object
     const filter = {};
     if (dateFrom && dateTo) {
       filter.date = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
@@ -21,20 +20,15 @@ const getTransactions = async (req, res) => {
     if (payeeId) filter.payee_id = payeeId;
     if (transactionId) filter.transaction_id = transactionId;
 
-    // Calculate pagination
     const skip = (page - 1) * limit;
-    
-    // Get total count
     const total = await Transaction.countDocuments(filter);
     
-    // Get transactions
     const transactions = await Transaction.find(filter)
       .skip(skip)
       .limit(parseInt(limit))
       .sort({ date: -1 })
-      .lean()  // Convert to plain JavaScript objects
+      .lean()
       .then(transactions => transactions.map(txn => ({
-        // Transform field names to match frontend expectations
         id: txn.transaction_id,
         date: txn.date,
         amount: txn.amount,
@@ -46,7 +40,6 @@ const getTransactions = async (req, res) => {
         fraudReported: txn.is_fraud_reported ? 'Yes' : 'No'
       })));
 
-    // Define dynamic columns
     const columns = [
       { key: 'id', label: 'Transaction ID', type: 'text' },
       { key: 'date', label: 'Date & Time', type: 'text' },
@@ -59,7 +52,6 @@ const getTransactions = async (req, res) => {
       { key: 'fraudReported', label: 'Fraud Sent', type: 'status' }
     ];
 
-    // Send response
     res.json({
       data: {
         transactions,
@@ -74,7 +66,6 @@ const getTransactions = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getTransactions:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -100,7 +91,6 @@ const getTransactionStats = async (req, res) => {
       fraudulentTransactions: 0
     };
 
-    // Calculate fraud rate
     const fraudRate = result.totalTransactions > 0 
       ? (result.fraudulentTransactions / result.totalTransactions) * 100 
       : 0;
@@ -113,7 +103,6 @@ const getTransactionStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getTransactionStats:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
